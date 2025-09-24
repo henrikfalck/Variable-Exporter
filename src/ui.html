@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Export Variables UI</title>
+    <style>
+      /* Bruk Figma sine tema-tokens. Figma injiserer .figma-light/.figma-dark og --figma-color-* når themeColors: true */
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
+        font: 13px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      }
+
+      /* Layout */
+      header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--figma-color-border);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--figma-color-text);
+      }
+
+      .wrap {
+        padding: 12px 16px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .list {
+        display: grid;
+        gap: 8px;
+        max-height: 380px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-top: 1px solid var(--figma-color-border);
+        background: var(--figma-color-bg-secondary);
+        position: sticky;
+        bottom: 0;
+      }
+
+      /* Cards */
+      .card {
+        border: 1px solid var(--figma-color-border);
+        border-radius: 12px;
+        padding: 10px;
+        display: grid;
+        gap: 8px;
+        background: var(--figma-color-bg-secondary);
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--figma-color-text);
+      }
+
+      /* Text utilities */
+      .small,
+      .hint,
+      .meta {
+        color: var(--figma-color-text-secondary);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 200px;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .row .meta {
+        font-size: 16px;
+      }
+
+      /* Link style */
+      a {
+        color: var(--figma-color-text-brand);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      a:active {
+        color: var(--figma-color-text-brand-pressed);
+      }
+
+      a:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--figma-color-border-selected), transparent 80%);
+        border-radius: 4px;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--figma-color-border-strong);
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .btn:hover {
+        background: var(--figma-color-bg-hover);
+      }
+
+      .btn:active {
+        background: var(--figma-color-bg-pressed);
+      }
+
+      .btn:focus-visible {
+        outline: none;
+        border-color: var(--figma-color-border-selected);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--figma-color-border-selected), transparent 80%);
+      }
+
+      .btn.primary {
+        background: var(--figma-color-bg-brand);
+        border-color: var(--figma-color-bg-brand);
+        color: var(--figma-color-text-onbrand);
+      }
+
+      .btn.primary:hover {
+        background: var(--figma-color-bg-brand-hover);
+      }
+
+      .btn.primary:active {
+        background: var(--figma-color-bg-brand-pressed);
+      }
+
+      .btn:disabled,
+      .btn[disabled] {
+        cursor: not-allowed;
+        background: var(--figma-color-bg-disabled);
+        border-color: var(--figma-color-border);
+        color: var(--figma-color-text-disabled);
+      }
+
+      /* Inputs (select + checkbox) */
+      .input,
+      select {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid var(--figma-color-border-strong);
+        border-radius: 8px;
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
+        outline: none;
+        appearance: none;
+        background-image:
+          linear-gradient(45deg, transparent 50%, var(--figma-color-text-secondary) 50%),
+          linear-gradient(135deg, var(--figma-color-text-secondary) 50%, transparent 50%),
+          linear-gradient(to right, transparent, transparent);
+        background-position:
+          calc(100% - 14px) calc(50% - 2px),
+          calc(100% - 8px) calc(50% - 2px),
+          100% 0;
+        background-size: 6px 6px, 6px 6px, 2em 2.5em;
+        background-repeat: no-repeat;
+      }
+
+      select:hover {
+        background: var(--figma-color-bg-hover);
+      }
+
+      select:focus {
+        border-color: var(--figma-color-border-selected);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--figma-color-border-selected), transparent 80%);
+      }
+
+      select:disabled {
+        background: var(--figma-color-bg-disabled);
+        color: var(--figma-color-text-disabled);
+        border-color: var(--figma-color-border);
+        cursor: not-allowed;
+      }
+
+      /* Checkbox label aligns to tokens; vi lar native checkbox være, men håndterer focus og disabled states på label */
+      .checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--figma-color-text-secondary);
+        user-select: none;
+      }
+
+      .checkbox input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+        accent-color: var(--figma-color-bg-brand);
+        cursor: pointer;
+      }
+
+      .checkbox input[type="checkbox"]:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--figma-color-border-selected), transparent 80%);
+        border-radius: 3px;
+      }
+
+      .checkbox input[type="checkbox"]:disabled+span {
+        color: var(--figma-color-text-disabled);
+        cursor: not-allowed;
+      }
+
+      /* Subtle scrollbar */
+      .list::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .list::-webkit-scrollbar-thumb {
+        background: var(--figma-color-bg-tertiary);
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Export Variables</h1>
+    </header>
+
+    <div class="wrap">
+      <div class="small hint">
+        Velg <b>mode</b> for hver collection før eksport.
+      </div>
+
+      <div id="list" class="list"></div>
+    </div>
+
+    <div class="controls">
+      <label class="checkbox">
+        <input id="skipEmpty" type="checkbox" checked>
+        <span>Hopp over tomme collections</span>
+      </label>
+      <div style="display:flex; gap:8px;">
+        <button id="useDefault" class="btn">Velg alle</button>
+        <button id="export" class="btn primary">Eksporter variabler</button>
+      </div>
+    </div>
+
+    <script
+      defer
+      src="./ui.js"
+      onload="try{parent.postMessage({pluginMessage:{type:'UI_JS_LOADED'}},'*')}catch(e){}"
+      onerror="try{parent.postMessage({pluginMessage:{type:'UI_JS_LOAD_ERROR', error:'failed to load ./ui.js'}},'*')}catch(e){}"
+    ></script>
+  </body>
+
+</html>

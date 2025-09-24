@@ -1,0 +1,11 @@
+{
+  "name": "Document Variables",
+  "id": "export-variables-to-frames-ui",
+  "api": "1.0.0",
+  "editorType": [
+    "figma"
+  ],
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "enableProposedApi": false
+}
