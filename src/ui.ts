@@ -1,25 +1,6 @@
 import type { CollectionInfo, ExportRequest } from "./types";
 
-// UI entrypoint
-console.log("[UI] boot");
-window.addEventListener("error", (e) => {
-   try { console.error("[UI] error", e?.message || e); } catch {}
-});
-window.addEventListener("unhandledrejection", (e: any) => {
-   try { console.error("[UI] unhandledrejection", e?.reason || e); } catch {}
-});
-
-// Relay UI console logs to main so they appear in Figma console
-(() => {
-   const levels: (keyof Console)[] = ["log", "info", "warn", "error"];
-   for (const lvl of levels) {
-      const orig = console[lvl] as any;
-      (console as any)[lvl] = function (...args: any[]) {
-         try { parent.postMessage({ pluginMessage: { type: "UI_LOG", level: String(lvl), args } }, "*"); } catch {}
-         try { orig.apply(console, args); } catch {}
-      } as any;
-   }
-})();
+// UI entrypoint (minimal)
 
 // (types from main messages are handled dynamically; explicit union removed)
 
@@ -89,7 +70,6 @@ function extractMessage(event: any): any {
 function handleMessage(msg: any) {
    if (!msg || !msg.type) return;
    if (msg.type === "BOOTSTRAP") {
-      console.log("[UI] BOOTSTRAP collections", (msg.collections && msg.collections.length) || 0);
       const collections = (msg.collections || []) as CollectionInfo[];
       state.collections = collections;
       const next: Record<string, boolean> = {};
@@ -101,8 +81,6 @@ function handleMessage(msg: any) {
       $export.textContent = "Eksporter variabler";
       setBusy(false);
       render();
-      // Ack back to main for visibility when UI console isn't open
-      parent.postMessage({ pluginMessage: { type: "UI_READY_ACK", collections: collections.length } }, "*");
    } else if (msg.type === "EXPORT_DONE" || msg.type === "EXPORT_ERROR") {
       setBusy(false);
       $export.textContent = "Eksporter variabler";
@@ -117,11 +95,7 @@ window.onmessage = (event) => {
 };
 
 // Secondary message listener (some runtimes dispatch here)
-window.addEventListener("message", (event) => {
-   const msg = extractMessage(event);
-   console.log("[UI] addEventListener message", msg);
-   handleMessage(msg);
-});
+// (no secondary listener)
 
 (function pingMain() {
    // Bekrefter at UI-iframe lever og kan snakke med main

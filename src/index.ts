@@ -333,7 +333,6 @@ async function renderExport(req: ExportRequest) {
 function postBootstrap() {
    const snapshot = getCollectionsSnapshot();
    const payload = { type: "BOOTSTRAP", collections: snapshot };
-   console.log("[MAIN] postMessage BOOTSTRAP", { collections: snapshot.length });
    try {
       // Explicit origin for stricter runtimes
       // @ts-ignore - postMessage options accepted at runtime
@@ -344,17 +343,6 @@ function postBootstrap() {
 }
 
 figma.ui.onmessage = async (msg: any) => {
-   console.log("[MAIN] onmessage", msg);
-   if (msg && msg.type === "UI_LOG") {
-      const level = (msg.level || "log").toLowerCase();
-      const text = `[UI] ${JSON.stringify(msg.args)}`;
-      try {
-         if (level === "error") console.error(text);
-         else if (level === "warn") console.warn(text);
-         else console.log(text);
-      } catch { console.log(text); }
-      return;
-   }
    if (msg && msg.type === "UI_PING") {
       // UI bekrefter at den er klar – send bootstrap igjen i tilfelle race
       postBootstrap();
@@ -380,7 +368,6 @@ figma.ui.onmessage = async (msg: any) => {
 };
 
 function showUI() {
-   console.log("[MAIN] showUI");
    figma.showUI(__html__, { width: 520, height: 560, themeColors: true });
    // Fallback: send BOOTSTRAP right away and once more shortly after.
    // UI will also trigger a UI_PING which we handle separately.
