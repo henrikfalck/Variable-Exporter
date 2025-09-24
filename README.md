@@ -1,4 +1,4 @@
-![Logo](./icon.png)
+![Logo](./documentation/icon.png)
 
 # Variable Documenter
 
@@ -16,9 +16,14 @@ You'll need to run the plugin once before you can use it, so that the plugin bui
 cd [your/path] && npm run build
 ```
 
+Then, add the plugin via `Plugins -> Development -> Import plugin from manifest...`
+
+![alt text](./documentation/image.png)
+
 You can now use the plugin as you wish inside of Figma.
 
 ## To-do
+
 - Add a link from aliases to their respective variable
 - Add a min-width on all columns
 - See if a grid solution is better than flex
