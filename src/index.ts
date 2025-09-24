@@ -31,6 +31,13 @@ function getCollectionsSnapshot(): CollectionInfo[] {
    }));
 }
 
+/**
+ * Build the documentation frames for the current document's local variable collections.
+ * - One collection card per collection
+ * - Header row with fixed-width columns
+ * - Grouped rows by first name segment (only when present)
+ * - Per-mode cells render value, color swatch, boolean chip, or alias chip
+ */
 async function renderExport(req: ExportRequest) {
    await loadFonts();
 

@@ -1,5 +1,6 @@
 import type { CollectionInfo, ExportRequest } from "./types";
 
+// UI entrypoint
 console.log("[UI] boot");
 window.addEventListener("error", (e) => {
    try { console.error("[UI] error", e?.message || e); } catch {}
@@ -22,6 +23,7 @@ window.addEventListener("unhandledrejection", (e: any) => {
 
 // (types from main messages are handled dynamically; explicit union removed)
 
+// Minimal UI state: current collections and which ones to include on export
 let state: { collections: CollectionInfo[]; includeByCollection: Record<string, boolean> } = {
    collections: [],
    includeByCollection: {}
@@ -33,11 +35,15 @@ const $useDefault = document.getElementById("useDefault") as HTMLButtonElement;
 const $skipEmpty = document.getElementById("skipEmpty") as HTMLInputElement;
 console.log("[UI] wired elements", { hasList: !!$list, hasExport: !!$export, hasUseDefault: !!$useDefault, hasSkipEmpty: !!$skipEmpty });
 
+/** Enable/disable main controls during export/bootstrap. */
 function setBusy(busy: boolean) {
    $export.disabled = busy;
    $useDefault.disabled = busy;
 }
 
+/**
+ * Render the list of collections with an "include" checkbox per collection.
+ */
 function render() {
    $list.innerHTML = "";
    if (!state.collections || state.collections.length === 0) {
@@ -103,12 +109,14 @@ function handleMessage(msg: any) {
    }
 }
 
+// Primary message handler — receives messages posted by main (plugin side)
 window.onmessage = (event) => {
    const msg = extractMessage(event);
    console.log("[UI] window.onmessage", msg);
    handleMessage(msg);
 };
 
+// Secondary message listener (some runtimes dispatch here)
 window.addEventListener("message", (event) => {
    const msg = extractMessage(event);
    console.log("[UI] addEventListener message", msg);

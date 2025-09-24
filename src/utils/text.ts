@@ -1,3 +1,7 @@
+/**
+ * Preload the fonts used by this plugin.
+ * Keep this list in sync with any makeText() usages where a different family/style is passed.
+ */
 export async function loadFonts() {
    const fonts: FontName[] = [
       // Inter (legacy)
@@ -17,6 +21,10 @@ export async function loadFonts() {
    for (const f of fonts) { try { await figma.loadFontAsync(f); } catch { } }
 }
 
+/**
+ * Create a text node with the given characters and font.
+ * The caller is responsible for layout (align/grow/resize) after appending.
+ */
 export function makeText(characters: string, font: FontName = { family: "Inter", style: "Regular" }) {
    const t = figma.createText();
    t.fontName = font;
